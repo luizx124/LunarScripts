@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zunder - Acesso Acadêmico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#121214',
+                        cardbg: '#18181b',
+                        sidebarbg: '#09090b',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0b0b0d; color: #f4f4f5; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    </style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+    <div id="login-view" class="flex-1 flex flex-col items-center justify-center bg-[#0b0b0d] p-4 overflow-y-auto">
+        <div class="mb-6 text-center">
+            <h1 class="text-4xl font-black italic tracking-wider text-white mb-1">Zunder</h1>
+        </div>
+
+        <div class="w-full max-w-md bg-[#121214] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 shadow-2xl relative">
+            <div class="mb-6 text-center">
+                <h2 class="text-xl font-bold text-white mb-1">Entrar na conta</h2>
+                <p class="text-xs text-zinc-400">Use seu RA e senha da Sala do Futuro</p>
+            </div>
+
+            <form id="auth-form" onsubmit="handleLogin(event)" class="space-y-4">
+                
+                <!-- RA, Digit, UF Row -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">RA</label>
+                        <div class="flex gap-12 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider pr-4 sm:pr-8">
+                            <span>Dígito</span>
+                            <span>UF</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <!-- RA input -->
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500">
+                                <i class="fa-solid fa-user text-xs"></i>
+                            </span>
+                            <input type="text" id="ra-input" required placeholder="Números do RA (sem o dígito)" 
+                                class="w-full bg-[#18181b] border border-zinc-800 focus:border-teal-500 text-white text-xs rounded-xl pl-9 pr-3 py-3 outline-none transition placeholder:text-zinc-600">
+                        </div>
+
+                        <!-- Digit input -->
+                        <input type="text" id="digit-input" maxlength="2" required placeholder="00" 
+                            class="w-14 bg-[#18181b] border border-zinc-800 focus:border-teal-500 text-white text-xs rounded-xl text-center py-3 outline-none transition placeholder:text-zinc-600">
+
+                        <!-- UF select -->
+                        <select id="uf-input" class="w-16 bg-[#18181b] border border-zinc-800 focus:border-teal-500 text-white text-xs rounded-xl px-2 py-3 outline-none transition cursor-pointer">
+                            <option value="SP" selected>SP</option>
+                            <option value="AC">AC</option>
+                            <option value="AL">AL</option>
+                            <option value="AP">AP</option>
+                            <option value="AM">AM</option>
+                            <option value="BA">BA</option>
+                            <option value="CE">CE</option>
+                            <option value="DF">DF</option>
+                            <option value="ES">ES</option>
+                            <option value="GO">GO</option>
+                            <option value="MA">MA</option>
+                            <option value="MT">MT</option>
+                            <option value="MS">MS</option>
+                            <option value="MG">MG</option>
+                            <option value="PA">PA</option>
+                            <option value="PB">PB</option>
+                            <option value="PR">PR</option>
+                            <option value="PE">PE</option>
+                            <option value="PI">PI</option>
+                            <option value="RJ">RJ</option>
+                            <option value="RN">RN</option>
+                            <option value="RS">RS</option>
+                            <option value="RO">RO</option>
+                            <option value="RR">RR</option>
+                            <option value="SC">SC</option>
+                            <option value="SE">SE</option>
+                            <option value="TO">TO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-zinc-400 uppercase tracking-wider mb-1.5">Senha</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500">
+                            <i class="fa-solid fa-lock text-xs"></i>
+                        </span>
+                        <input type="password" id="pass-input" required placeholder="Digite sua senha" 
+                            class="w-full bg-[#18181b] border border-zinc-800 focus:border-teal-500 text-white text-xs rounded-xl pl-9 pr-10 py-3 outline-none transition placeholder:text-zinc-600">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-500 hover:text-zinc-300 transition">
+                            <i id="eye-icon" class="fa-solid fa-eye-slash text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cloudflare human check box replica -->
+                <div class="bg-[#18181b] border border-zinc-800 rounded-xl p-3.5 flex items-center justify-between shadow-inner">
+                    <label class="flex items-center gap-3 cursor-pointer select-none">
+                        <input type="checkbox" id="cloudflare-check" required class="w-5 h-5 rounded bg-zinc-900 border-zinc-700 text-teal-500 focus:ring-0 cursor-pointer">
+                        <span class="text-xs text-zinc-300 font-medium">Confirme que é humano</span>
+                    </label>
+                    <div class="flex flex-col items-end opacity-75">
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-cloud text-[10px] text-orange-400"></i>
+                            <span class="text-[10px] font-black tracking-tight text-white">CLOUDFLARE</span>
+                        </div>
+                        <span class="text-[8px] text-zinc-500 tracking-tighter">Privacidade · Termos</span>
+                    </div>
+                </div>
+
+                <!-- Terms agreement checkbox -->
+                <div class="flex items-center gap-2 pt-1">
+                    <input type="checkbox" id="terms-check" required class="rounded bg-zinc-900 border-zinc-700 text-teal-500 focus:ring-0 cursor-pointer">
+                    <label for="terms-check" class="text-[11px] text-zinc-400 select-none">
+                        Li e concordo com os <a href="#" class="text-zinc-300 underline hover:text-white transition">Termos de Uso</a> e a <a href="#" class="text-zinc-300 underline hover:text-white transition">Política de Privacidade</a>.
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-3 px-4 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2 mt-2">
+                    <i class="fa-solid fa-right-to-bracket text-zinc-400"></i> Entrar
+                </button>
+
+                <!-- Saved Accounts Button -->
+                <button type="button" onclick="alertCustom('Nenhuma conta salva neste dispositivo.')" class="w-full bg-[#18181b] hover:bg-zinc-800/80 border border-zinc-800 text-zinc-300 font-semibold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-users text-zinc-500"></i> Contas salvas
+                </button>
+            </form>
+
+            <div id="login-error" class="hidden mt-3 p-2.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl text-center">
+                Preencha todos os campos e confirme a verificação.
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="flex-1 flex h-screen overflow-hidden hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-[#09090b] border-r border-zinc-800 flex flex-col justify-between hidden md:flex shrink-0">
+            <div>
+                <div class="p-6 flex items-center">
+                    <h1 class="text-2xl font-black italic tracking-wider text-white">Zunder</h1>
+                </div>
+
+                <div class="px-4 py-2">
+                    <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-3">Principal</p>
+                    <nav class="space-y-1">
+                        <a href="#" onclick="switchTab('home')" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-zinc-800 text-white font-medium text-sm transition">
+                            <i class="fa-solid fa-house w-5 text-zinc-400"></i> Início
+                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-white font-medium text-sm transition">
+                            <span class="flex items-center gap-3"><i class="fa-solid fa-list-check w-5"></i> TarefaSP</span>
+                            <span class="bg-zinc-800 text-zinc-300 text-xs px-2 py-0.5 rounded-full font-semibold">1</span>
+                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-white font-medium text-sm transition">
+                            <span class="flex items-center gap-3"><i class="fa-solid fa-pen-nib w-5"></i> Redação</span>
+                            <span class="bg-zinc-800 text-zinc-300 text-xs px-2 py-0.5 rounded-full font-semibold">1</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-white font-medium text-sm transition">
+                            <i class="fa-solid fa-layer-group w-5"></i> Plataformas
+                        </a>
+                        <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-white font-medium text-sm transition">
+                            <i class="fa-solid fa-book w-5"></i> Apostilas
+                        </a>
+                    </nav>
+
+                    <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mt-8 mb-3 px-3">Comunidade</p>
+                    <nav class="space-y-1">
+                        <a href="https://discord.com" target="_blank" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-white font-medium text-sm transition">
+                            <span class="flex items-center gap-3"><i class="fa-brands fa-discord w-5"></i> Discord</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-600"></i>
+                        </a>
+                        <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-white font-medium text-sm transition">
+                            <span class="flex items-center gap-3"><i class="fa-solid fa-globe w-5"></i> HITE</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-zinc-600"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-zinc-800/80 bg-[#0c0c0e]">
+                <div class="flex items-center justify-between bg-zinc-900/60 p-3 rounded-xl border border-zinc-800">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div id="user-initial" class="w-9 h-9 rounded-full bg-zinc-700 flex items-center justify-center font-bold text-white shrink-0">T</div>
+                        <div class="truncate">
+                            <p id="user-ra-display" class="text-xs font-bold text-white truncate">THISSEANY</p>
+                            <p class="text-[10px] text-zinc-400 truncate">1ª SÉRIE C NOITE ANUAL</p>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" title="Sair" class="text-zinc-400 hover:text-white transition p-1.5"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#121214]">
+            
+            <div id="tab-home" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+                
+                <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-6 flex items-center gap-5 shadow-lg">
+                    <div id="user-initial-banner" class="w-14 h-14 rounded-full bg-zinc-700 flex items-center justify-center text-xl font-bold text-white shrink-0 shadow-inner">
+                        T
+                    </div>
+                    <div>
+                        <h2 id="welcome-name" class="text-xl sm:text-2xl font-bold text-white tracking-tight">Boa tarde, Luiz Otavio</h2>
+                        <p class="text-xs sm:text-sm text-zinc-400 font-medium mt-0.5">1ª SÉRIE A NOITE ANUAL · NEYDY DE CAMPOS MELGES PROF</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium text-zinc-400 flex items-center gap-2">
+                                <i class="fa-regular fa-file-lines text-zinc-500"></i> PENDÊNCIAS
+                            </span>
+                        </div>
+                        <div class="my-3">
+                            <span class="text-4xl font-extrabold text-white tracking-tight">2</span>
+                        </div>
+                        <p class="text-xs text-zinc-400">1 tarefa · 1 redação</p>
+                    </div>
+
+                    <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-lg">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-medium text-zinc-400 flex items-center gap-2">
+                                <i class="fa-regular fa-calendar text-zinc-500"></i> FALTAS
+                            </span>
+                        </div>
+                        <div class="my-3">
+                            <span class="text-2xl sm:text-3xl font-semibold text-zinc-400 tracking-tight">—</span>
+                        </div>
+                        <p class="text-xs text-zinc-400">Não foi possível atualizar</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-6 shadow-lg relative overflow-hidden">
+                    <div class="absolute top-6 right-6 text-right">
+                        <span class="text-2xl sm:text-3xl font-extrabold text-white">504</span>
+                        <p class="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">Doações hoje</p>
+                    </div>
+
+                    <div class="max-w-xl">
+                        <h3 class="text-lg font-bold text-white mb-2">Doações</h3>
+                        <h4 class="text-base font-semibold text-zinc-200 mb-2">Ajude o Zunder a se manter</h4>
+                        <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed mb-6">
+                            Todos os desenvolvedores trabalham de graça pra ajudar você, que não tem tempo ou oportunidade. Até 10 centavos já ajudam a manter tudo funcionando. Obrigado e bons estudos!
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-zinc-800 pt-5">
+                            <div class="text-xs text-zinc-400">
+                                <span>Doe + R$ 4,90 para desbloquear o Apoiador</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-bold text-zinc-300">R$ 0,00 de R$ 4,90</span>
+                                <span class="text-[11px] text-zinc-500 flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> Benefícios do Apoiador</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-5">
+                            <button onclick="openDonationScreen()" class="bg-[#14b8a6] hover:bg-[#0d9488] text-zinc-950 font-bold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition shadow-md cursor-pointer">
+                                <i class="fa-solid fa-diamond"></i> Fazer uma doação
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-4">SUAS PLATAFORMAS</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        
+                        <!-- TarefaSP -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shrink-0">
+                                    <i class="fa-solid fa-square-check text-xl text-teal-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">TarefaSP</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Resolve as tarefas da Sala do Futuro</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Redação -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shrink-0">
+                                    <i class="fa-solid fa-pen-to-square text-xl text-teal-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Redação</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Envia redações automaticamente</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alura -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-bold text-lg shrink-0">
+                                    a
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Alura</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Cursos e trilhas de tecnologia</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Open English -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white text-[10px] font-bold shrink-0 tracking-tighter">
+                                    open.
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Open English</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Práticas de inglês: notícias, idioms, vídeos e pronúncia</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Educação Profissional -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    Edu.
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Educação Profissional</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Cursos técnicos e profissionalizantes</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Matemática EM -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-black text-lg shrink-0">
+                                    M
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Matemática EM</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Tópicos e quizzes de matemática do Ensino Médio</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expansão Noturna -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shrink-0">
+                                    <i class="fa-solid fa-book-open text-lg text-teal-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Expansão Noturna</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Atividades do Expansão Noturna</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Khan Academy -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shrink-0">
+                                    <i class="fa-solid fa-seedling text-lg text-teal-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Khan Academy</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Avaliações de unidade do seu curso</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Matific -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-bold text-xs tracking-tight shrink-0">
+                                    matific
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Matific</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Atividades de matemática</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LeiaSP -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white text-[10px] font-bold shrink-0 tracking-tighter">
+                                    Leia SP
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">LeiaSP</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Leituras e atividades</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prepara-SP -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white shrink-0">
+                                    <i class="fa-solid fa-graduation-cap text-lg text-teal-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">Prepara-SP</h4>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Preparação para vestibulares e ENEM</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Speak -->
+                        <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-zinc-700 transition cursor-pointer shadow-lg">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    Speak
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-sm font-bold text-white">Speak</h4>
+                                        <span class="text-[9px] bg-teal-500/10 text-teal-400 border border-teal-500/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">APOIADOR</span>
+                                    </div>
+                                    <p class="text-xs text-zinc-400 mt-1 leading-relaxed">Aulas de inglês do EF Speak</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-donation" class="flex-1 overflow-y-auto p-4 sm:p-8 hidden bg-[#121214]">
+                <div class="max-w-2xl mx-auto space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Fazer uma doação</h2>
+                            <p class="text-xs text-zinc-400 mt-1">Ajude a manter os servidores e as APIs no ar</p>
+                        </div>
+                        <button onclick="closeDonationScreen()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-4 py-2 rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> Voltar ao Início
+                        </button>
+                    </div>
+
+                    <div class="bg-[#18181b] border border-zinc-800/80 rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Sua doação</h3>
+                            <p class="text-xs text-zinc-400 mt-1 leading-relaxed">
+                                Pagamento via PIX, processado pelo PixGG. A doação fica registrada no seu nome e soma no ranking de doadores.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">NOME EXIBIDO</label>
+                            <input type="text" id="donation-name" value="THISSEANY" 
+                                class="w-full bg-[#121214] border border-zinc-800 focus:border-teal-500 text-white text-sm rounded-xl px-4 py-3 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">MENSAGEM (OPCIONAL)</label>
+                            <textarea id="donation-msg" rows="3" placeholder="Deixe um recado..." 
+                                class="w-full bg-[#121214] border border-zinc-800 focus:border-teal-500 text-white text-sm rounded-xl p-4 outline-none transition placeholder:text-zinc-600 resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">VALOR</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                                <button type="button" onclick="selectDonationAmount(5, this)" class="donation-btn py-2.5 px-4 rounded-xl border border-zinc-800 bg-[#121214] hover:border-zinc-700 text-sm font-bold text-white transition">R$ 5</button>
+                                <button type="button" onclick="selectDonationAmount(10, this)" class="donation-btn py-2.5 px-4 rounded-xl border border-zinc-800 bg-[#121214] hover:border-zinc-700 text-sm font-bold text-white transition">R$ 10</button>
+                                <button type="button" onclick="selectDonationAmount(20, this)" class="donation-btn py-2.5 px-4 rounded-xl border border-zinc-800 bg-[#121214] hover:border-zinc-700 text-sm font-bold text-white transition">R$ 20</button>
+                                <button type="button" onclick="selectDonationAmount(50, this)" class="donation-btn py-2.5 px-4 rounded-xl border border-zinc-800 bg-[#121214] hover:border-zinc-700 text-sm font-bold text-white transition">R$ 50</button>
+                            </div>
+                            <input type="number" id="donation-custom-amount" min="0.80" step="0.10" placeholder="Ou digite outro valor (min. R$ 0,80)" 
+                                class="w-full bg-[#121214] border border-zinc-800 focus:border-teal-500 text-white text-sm rounded-xl px-4 py-3 outline-none transition placeholder:text-zinc-600">
+                        </div>
+
+                        <div id="pix-output" class="hidden p-4 bg-zinc-900 border border-zinc-800 rounded-xl text-center space-y-3">
+                            <p class="text-xs font-semibold text-teal-400">PIX gerado com sucesso! Escaneie o QR Code abaixo:</p>
+                            <div class="w-36 h-36 bg-white mx-auto rounded-lg flex items-center justify-center p-2">
+                                <img src="https://placehold.co/150x150/ffffff/000000?text=QR+Code+PIX" alt="QR Code PIX" class="w-full h-full object-contain">
+                            </div>
+                            <p class="text-[11px] text-zinc-400 truncate">Chave: 00020126580014br.gov.bcb.pix...</p>
+                        </div>
+
+                        <button onclick="handleGeneratePix()" class="w-full bg-white hover:bg-zinc-200 text-zinc-950 font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-lg cursor-pointer">
+                            Gerar PIX
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="w-full md:w-80 lg:w-96 bg-[#18181b]/50 border-t md:border-t-0 md:border-l border-zinc-800 p-4 sm:p-5 overflow-y-auto shrink-0 flex flex-col">
+                <div class="bg-[#121214] p-1 rounded-xl flex border border-zinc-800 mb-4">
+                    <button onclick="switchSidebarTab('donations')" id="sidebar-btn-donations" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-zinc-800 text-white text-center shadow transition">Doações</button>
+                    <button onclick="switchSidebarTab('ranking')" id="sidebar-btn-ranking" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-zinc-400 hover:text-white text-center transition">Ranking</button>
+                </div>
+
+                <div id="sidebar-content-donations">
+                    <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-1">Doações recentes</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/40 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300">N</div>
+                                <div><p class="text-xs font-bold text-white">NAYLLA</p></div>
+                            </div>
+                            <div class="text-right"><p class="text-xs font-bold text-white">R$ 0,80</p><p class="text-[10px] text-zinc-500">2 min</p></div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/40 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300">B</div>
+                                <div><p class="text-xs font-bold text-white">BRUNNO</p><p class="text-[10px] text-zinc-400">Oi</p></div>
+                            </div>
+                            <div class="text-right"><p class="text-xs font-bold text-white">R$ 5,00</p><p class="text-[10px] text-zinc-500">2 min</p></div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/40 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300">L</div>
+                                <div><p class="text-xs font-bold text-white">LUIZ</p></div>
+                            </div>
+                            <div class="text-right"><p class="text-xs font-bold text-white">R$ 5,00</p><p class="text-[10px] text-zinc-500">2 min</p></div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/40 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300">F</div>
+                                <div><p class="text-xs font-bold text-white">felipe6761</p></div>
+                            </div>
+                            <div class="text-right"><p class="text-xs font-bold text-white">R$ 4,90</p><p class="text-[10px] text-zinc-500">3 min</p></div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/40 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300">P</div>
+                                <div><p class="text-xs font-bold text-white">PATRICK</p></div>
+                            </div>
+                            <div class="text-right"><p class="text-xs font-bold text-white">R$ 2,00</p><p class="text-[10px] text-zinc-500">3 min</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sidebar-content-ranking" class="hidden">
+                    <p class="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-3 px-1">Top Doadores</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-zinc-800/40 border border-zinc-800">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-black text-amber-400">#1</span>
+                                <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs font-bold">M</div>
+                                <div><p class="text-xs font-bold text-white">MARIA</p></div>
+                            </div>
+                            <p class="text-xs font-bold text-amber-400">R$ 150,00</p>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/40 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-black text-zinc-400">#2</span>
+                                <div class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-300 flex items-center justify-center text-xs font-bold">E</div>
+                                <div><p class="text-xs font-bold text-white">EDUARDA</p></div>
+                            </div>
+                            <p class="text-xs font-bold text-white">R$ 85,00</p>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-xl hover:bg-zinc-800/40 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-black text-amber-700">#3</span>
+                                <div class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-300 flex items-center justify-center text-xs font-bold">G</div>
+                                <div><p class="text-xs font-bold text-white">GUILHERME</p></div>
+                            </div>
+                            <p class="text-xs font-bold text-white">R$ 50,00</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('pass-input');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            } else {
+                passInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const ra = document.getElementById('ra-input').value.trim();
+            const digit = document.getElementById('digit-input').value.trim();
+            const pass = document.getElementById('pass-input').value.trim();
+            const cloudflareChecked = document.getElementById('cloudflare-check').checked;
+            const termsChecked = document.getElementById('terms-check').checked;
+
+            if (!ra || !digit || !pass || !cloudflareChecked || !termsChecked) {
+                document.getElementById('login-error').classList.remove('hidden');
+                return;
+            }
+
+            const displayName = "ALUNO " + ra.slice(-4);
+            const initial = ra.charAt(0).toUpperCase() || 'T';
+
+            document.getElementById('user-ra-display').innerText = displayName;
+            document.getElementById('welcome-name').innerText = "Boa tarde, " + displayName;
+            document.getElementById('user-initial').innerText = initial;
+            document.getElementById('user-initial-banner').innerText = initial;
+            document.getElementById('donation-name').value = displayName;
+
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+        }
+
+        function handleLogout() {
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('ra-input').value = '';
+            document.getElementById('digit-input').value = '';
+            document.getElementById('pass-input').value = '';
+            document.getElementById('cloudflare-check').checked = false;
+            document.getElementById('terms-check').checked = false;
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        function switchTab(tabName) {
+            if (tabName === 'home') {
+                document.getElementById('tab-home').classList.remove('hidden');
+                document.getElementById('tab-donation').classList.add('hidden');
+            }
+        }
+
+        function openDonationScreen() {
+            document.getElementById('tab-home').classList.add('hidden');
+            document.getElementById('tab-donation').classList.remove('hidden');
+            document.getElementById('tab-donation').scrollTop = 0;
+        }
+
+        function closeDonationScreen() {
+            document.getElementById('tab-donation').classList.add('hidden');
+            document.getElementById('tab-home').classList.remove('hidden');
+        }
+
+        function selectDonationAmount(amount, btnElement) {
+            document.querySelectorAll('.donation-btn').forEach(btn => {
+                btn.classList.remove('border-teal-500', 'bg-teal-500/10');
+            });
+            btnElement.classList.add('border-teal-500', 'bg-teal-500/10');
+            document.getElementById('donation-custom-amount').value = amount;
+        }
+
+        function handleGeneratePix() {
+            const amount = document.getElementById('donation-custom-amount').value;
+            if (!amount || amount < 0.80) {
+                alertCustom("Por favor, selecione ou digite um valor mínimo de R$ 0,80 para gerar o PIX.");
+                return;
+            }
+            document.getElementById('pix-output').classList.remove('hidden');
+        }
+
+        function switchSidebarTab(tab) {
+            const btnDonations = document.getElementById('sidebar-btn-donations');
+            const btnRanking = document.getElementById('sidebar-btn-ranking');
+            const contentDonations = document.getElementById('sidebar-content-donations');
+            const contentRanking = document.getElementById('sidebar-content-ranking');
+
+            if (tab === 'donations') {
+                btnDonations.classList.add('bg-zinc-800', 'text-white', 'shadow');
+                btnDonations.classList.remove('text-zinc-400');
+                btnRanking.classList.remove('bg-zinc-800', 'text-white', 'shadow');
+                btnRanking.classList.add('text-zinc-400');
+                contentDonations.classList.remove('hidden');
+                contentRanking.classList.add('hidden');
+            } else {
+                btnRanking.classList.add('bg-zinc-800', 'text-white', 'shadow');
+                btnRanking.classList.remove('text-zinc-400');
+                btnDonations.classList.remove('bg-zinc-800', 'text-white', 'shadow');
+                btnDonations.classList.add('text-zinc-400');
+                contentRanking.classList.remove('hidden');
+                contentDonations.classList.add('hidden');
+            }
+        }
+
+        function alertCustom(msg) {
+            alert(msg);
+        }
+    </script>
+</body>
+</html>
